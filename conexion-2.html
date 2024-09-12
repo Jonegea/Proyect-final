@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Arkanoid server</title>
   <style>
-
     canvas {
         border: 1px solid black;
     }
@@ -18,7 +17,6 @@
     h1 {
       color: #333;
     }
-
   </style>
 </head>
 <body>
@@ -29,6 +27,13 @@
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
     const socket = new WebSocket('ws://localhost:8080');
+
+    // Variables para la paleta
+    const paddleWidth = 80;
+    const paddleHeight = 10;
+    const paddleY = canvas.height - 20;  // Altura desde el borde inferior
+    let paddleX = (canvas.width / 2) - (paddleWidth / 2);  // Posición inicial centrada
+    const paddleSpeed = 20;  // Velocidad de movimiento de la paleta
 
     socket.onmessage = function(event) {
       const data = JSON.parse(event.data);
@@ -48,7 +53,7 @@
       // Dibujar paletas para cada jugador conectado
       for (let i = 0; i < clientCount; i++) {
         if (i === 0) {
-          drawPaddle('left');
+          drawPaddle(paddleX, paddleY);
         } else if (i === 1) {
           drawPaddle('right');
         }
@@ -65,26 +70,25 @@
       ctx.stroke();
     }
 
-    // Dibujar la paleta en la mitad correspondiente
-    function drawPaddle(side) {
-      const paddleWidth = 80;
-      const paddleHeight = 10;
-      const paddleY = canvas.height - 20;  // Altura desde el borde inferior
-    
-      let paddleX;
-    
-      if (side === 'left') {
-        // Colocar paleta en la mitad izquierda, centrada horizontalmente
-        paddleX = (canvas.width / 4) - (paddleWidth / 2);
-      } else if (side === 'right') {
-        // Colocar paleta en la mitad derecha, centrada horizontalmente
-        paddleX = (3 * canvas.width / 4) - (paddleWidth / 2);
-      }
-    
-      // Dibujar la paleta
+    // Dibujar la paleta
+    function drawPaddle(x, y) {
       ctx.fillStyle = 'lightblue';
-      ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+      ctx.fillRect(x, y, paddleWidth, paddleHeight);
     }
+
+    // Control de movimiento de la paleta
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'ArrowLeft' && paddleX > 0) {
+        paddleX -= paddleSpeed;  // Mover a la izquierda
+      } else if (event.key === 'ArrowRight' && paddleX < canvas.width - paddleWidth) {
+        paddleX += paddleSpeed;  // Mover a la derecha
+      }
+
+      drawCanvas(1);  // Redibujar canvas
+    });
+
+    // Dibujar la paleta inicial
+    drawCanvas(1);  // Ajusta el número según el número de clientes conectados
 
   </script>
 </body>
