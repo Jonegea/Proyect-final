@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arkanoid server</title>
+  <style>
+
+    canvas {
+        border: 1px solid black;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    
+    h1 {
+      color: #333;
+    }
+
+  </style>
+</head>
+<body>
+  <h1>Arkanoid</h1>
+  <canvas id="matrixCanvas" width="600" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+    const socket = new WebSocket('ws://localhost:8080');
+
+    socket.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+    
+      if (data.type === 'clientCount') {
+        const clientCount = data.clientCount;
+        drawCanvas(clientCount);
+      }
+    };
+
+    function drawCanvas(clientCount) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar el canvas
+    
+      // Dibujar línea en el centro
+      drawCenterLine();
+    
+      // Dibujar paletas para cada jugador conectado
+      for (let i = 0; i < clientCount; i++) {
+        if (i === 0) {
+          drawPaddle('left');
+        } else if (i === 1) {
+          drawPaddle('right');
+        }
+      }
+    }
+
+    // Dibujar la línea en el centro
+    function drawCenterLine() {
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Dibujar la paleta en la mitad correspondiente
+    function drawPaddle(side) {
+      const paddleWidth = 80;
+      const paddleHeight = 10;
+      const paddleY = canvas.height - 20;  // Altura desde el borde inferior
+    
+      let paddleX;
+    
+      if (side === 'left') {
+        // Colocar paleta en la mitad izquierda, centrada horizontalmente
+        paddleX = (canvas.width / 4) - (paddleWidth / 2);
+      } else if (side === 'right') {
+        // Colocar paleta en la mitad derecha, centrada horizontalmente
+        paddleX = (3 * canvas.width / 4) - (paddleWidth / 2);
+      }
+    
+      // Dibujar la paleta
+      ctx.fillStyle = 'lightblue';
+      ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+    }
+
+  </script>
+</body>
+</html>

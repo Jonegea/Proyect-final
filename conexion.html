@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente WebSocket</title>
+    <style>
+        #messages {
+            border: 1px solid #ddd;
+            width: 300px;
+            height: 400px;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-top: 20px;
+        }
+        input, button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cliente WebSocket</h1>
+    <div id="messages"></div>
+
+    <input type="text" id="inputMessage" placeholder="Escribe un mensaje...">
+    <button onclick="sendMessage()">Enviar</button>
+
+    <script>
+        // Conectar al servidor WebSocket
+        const socket = new WebSocket('ws://localhost:8080');
+
+        // Referencia al contenedor de mensajes
+        const messagesDiv = document.getElementById('messages');
+
+        // Escuchar cuando la conexión esté abierta
+        socket.addEventListener('open', (event) => {
+            console.log('Conectado al servidor WebSocket');
+            addMessage('Conectado al servidor WebSocket');
+        });
+
+        // Escuchar mensajes del servidor
+        socket.addEventListener('message', (event) => {
+            console.log('Mensaje del servidor:', event.data);
+            addMessage(event.data);
+        });
+
+        // Escuchar cuando la conexión esté cerrada
+        socket.addEventListener('close', (event) => {
+            console.log('Desconectado del servidor WebSocket');
+            addMessage('Desconectado del servidor WebSocket');
+        });
+
+        // Función para enviar un mensaje al servidor
+        function sendMessage() {
+            const input = document.getElementById('inputMessage');
+            const message = input.value;
+            socket.send(message);
+            addMessage(`Tú: ${message}`);
+            input.value = '';
+        }
+
+        // Función para agregar un mensaje al contenedor de mensajes
+        function addMessage(message) {
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;  // Desplaza hacia abajo automáticamente
+        }
+    </script>
+</body>
+</html>
