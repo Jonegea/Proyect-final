@@ -1,24 +1,34 @@
+const express = require('express');
+const http = require('http');
 const WebSocket = require('ws');
-const server = new WebSocket.Server({ port: 8080 });
+const GameModel = require('./models/GameModel');
+const GameController = require('./controllers/GameController');
 
-const clients = new Map();
+// Crear el servidor
+const app = express();
+const server = http.createServer(app);
 
-server.on('connection', (ws) => {
-  const id = Math.random().toString(36).substring(2);
-  clients.set(id, ws);
-  
-  ws.on('message', (message) => {
-    // Envía el mensaje a todos los clientes excepto al remitente
-    clients.forEach((client, key) => {
-      if (key !== id) {
-        client.send(message);
-      }
-    });
-  });
+// Servidor WebSocket
+const wss = new WebSocket.Server({ server });
 
-  ws.on('close', () => {
-    clients.delete(id);
-  });
+// Modelo del juego
+const gameModel = new GameModel();
+
+// Controlador del juego
+const gameController = new GameController(gameModel, wss);
+
+// Sirve los archivos estáticos desde la carpeta 'public'
+app.use(express.static('public'));
+
+// Ruta para el HTML principal
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
 });
 
-console.log('Servidor WebSocket está corriendo en ws://localhost:8080');
+// Inicia el servidor en el puerto 3000
+server.listen(3000, () => {
+  console.log('Servidor corriendo en http://localhost:3000');
+});
+
+// Inicia el bucle del juego
+gameController.startGameLoop();
