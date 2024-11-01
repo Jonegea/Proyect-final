@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Break-it-Out</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 80vh;
+        }
+        #menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #startGame {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #gameCanvas {
+            display: none;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <h1>Selecciona una modalidad de juego</h1>
+        <button id="startGame">Un Jugador</button>
+        <button id="startGame2" disabled>2 Jugadores</button>
+    </div>
+    <canvas id="gameCanvas" width="900" height="500"></canvas>
+
+    <script src="client.js"></script>
+</body>
+</html>
